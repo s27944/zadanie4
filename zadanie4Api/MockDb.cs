@@ -6,6 +6,8 @@ public interface IMockDb
     public Animal? GetAnimalDetails(int id);
     public bool AddAnimal(Animal animal);
     public Animal? RemoveAnimal(int id);
+    public Animal? ReplaceAnimal(int id, Animal animal);
+
 }
 
 public class MockDb : IMockDb
@@ -57,5 +59,17 @@ public class MockDb : IMockDb
         if (animalToDelete is null) return null;
         _animals.Remove(animalToDelete);
         return animalToDelete;
+    }
+
+    public Animal? ReplaceAnimal(int id, Animal animal)
+    {
+        var animalToDelete = _animals.FirstOrDefault(e => e.Id == id);
+        if (animalToDelete is not null)
+        {
+            _animals.Remove(animalToDelete);
+        }
+
+        _animals.Add(animal);
+        return animal;
     }
 }

@@ -19,25 +19,43 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+
+
 app.MapGet("animals", (IMockDb mockDb) =>
 {
     return Results.Ok(mockDb.GetAllAnimals());
 });
 
-app.MapPut("animals", (IMockDb mockDb, Animal animal) =>
-{
-    return Results.Ok(mockDb.AddAnimal(animal));
-});
 
 app.MapGet("animals/{id}", (IMockDb mockDb, int id) =>
 {
-    return Results.Ok(mockDb.GetAnimalDetails(id));
+    var animal = mockDb.GetAnimalDetails(id);
+    if (animal is null) return Results.NotFound();
+
+    return Results.Ok(animal);
 });
+
+
+app.MapPost("animals", (IMockDb mockDb, Animal animal) =>
+{
+    mockDb.AddAnimal(animal);
+    return Results.Created("", animal);
+});
+
 
 app.MapDelete("animals/{id}", (IMockDb mockDb, int id) =>
 {
-    return Results.Ok(mockDb.RemoveAnimal(id));
+    var animal = mockDb.RemoveAnimal(id);
+    if (animal is null) return Results.NotFound();
+    
+    return Results.Ok(animal);
+});
+
+app.MapPut("animals", (IMockDb mockDb, int id, Animal animal) =>
+{
+    var ani = mockDb.ReplaceAnimal(id, animal);
+
+    return Results.Created("", ani);
 });
 
 app.Run();
-
