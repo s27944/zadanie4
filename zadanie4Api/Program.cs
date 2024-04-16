@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Http.HttpResults;
 using RestApiApp;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -25,6 +26,23 @@ app.MapGet("animals", (IMockDb mockDb) =>
 {
     return Results.Ok(mockDb.GetAllAnimals());
 });
+
+app.MapGet("animals/{id}/visits", (IMockDb mockDb, int id) =>
+{
+    var visits = mockDb.GetVisitsForAnimal(id);
+    if (visits is null) return Results.NotFound();
+    
+    return Results.Ok(visits);
+});
+
+app.MapPost("animals/{id}/visits", (IMockDb mockDb, Visit visit, int id) =>
+{
+    var visits = mockDb.AddVisit(visit, id);
+    if (visits is null) return Results.NotFound();
+    
+    return Results.Ok(visit);
+});
+
 
 
 app.MapGet("animals/{id}", (IMockDb mockDb, int id) =>

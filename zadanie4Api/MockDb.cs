@@ -1,4 +1,6 @@
-﻿namespace RestApiApp;
+﻿using System.Runtime.InteropServices.JavaScript;
+
+namespace RestApiApp;
 
 public interface IMockDb
 {
@@ -7,7 +9,8 @@ public interface IMockDb
     public bool AddAnimal(Animal animal);
     public Animal? RemoveAnimal(int id);
     public Animal? ReplaceAnimal(int id, Animal animal);
-
+    public ICollection<Visit> GetVisitsForAnimal(int id);
+    public Visit AddVisit(Visit visit, int id);
 }
 
 public class MockDb : IMockDb
@@ -24,7 +27,16 @@ public class MockDb : IMockDb
                 Name = "Puszek",
                 Category = "Doggo",
                 Weight = 10.5,
-                Color = "Grey"
+                Color = "Grey",
+                Visits = new List<Visit>
+                {
+                    new Visit
+                    {
+                        DateOfVisit = "10.06.2023",
+                        Description = "W porządku wizyta",
+                        Price = 100.50
+                    }
+                }
             },
             new Animal
             {
@@ -32,7 +44,16 @@ public class MockDb : IMockDb
                 Name = "Pusia",
                 Category = "Cateł",
                 Weight = 3,
-                Color = "Black"
+                Color = "Black",
+                Visits = new List<Visit>
+                {
+                    new Visit
+                    {
+                        DateOfVisit = "10.06.2023",
+                        Description = "Nie w porządku wizyta",
+                        Price = 1000.0
+                    }
+                }
             }
         };
     }
@@ -40,6 +61,25 @@ public class MockDb : IMockDb
     public ICollection<Animal> GetAllAnimals()
     {
         return _animals;
+    }
+    
+    public ICollection<Visit> GetVisitsForAnimal(int id)
+    {
+        Animal animal = _animals.FirstOrDefault(e => e.Id == id);
+        if (animal is null) return null;
+        ICollection < Visit > visits = animal.Visits; 
+        
+        
+        return visits;
+    }
+
+    public Visit AddVisit(Visit visit, int id)
+    {
+        Animal animal = _animals.FirstOrDefault(e => e.Id == id);
+        if (animal is null) return null;
+        
+        animal.Visits.Add(visit);
+        return visit;
     }
 
     public Animal? GetAnimalDetails(int id)
